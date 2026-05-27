@@ -21,24 +21,18 @@ module Enumerable
   end
 
   def my_all?
-    return to_enum(:my_all?) unless block_given?
-
     all_pass = true
     self.my_each { |element| all_pass = false unless yield element }
     return all_pass
   end
 
   def my_any?
-    return to_enum(:my_all?) unless block_given?
-
     self.my_each { |element| return true if yield element }
 
     return false
   end
 
   def my_none?
-    return to_enum(:my_none?) unless block_given?
-
     self.my_each { |element| return false if yield element }
 
     return true
@@ -58,6 +52,12 @@ module Enumerable
     mapped_array = []
     self.my_each { |element| mapped_array << (yield element) }
     return mapped_array
+  end
+
+  def my_inject (initial_value)
+    final_value = initial_value
+    self.my_each { |element| final_value = yield final_value, element}
+    return final_value
   end
 end
 
