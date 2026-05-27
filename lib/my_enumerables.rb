@@ -51,6 +51,14 @@ module Enumerable
     self.my_each { |element| count += 1 if yield element }
     return count
   end
+
+  def my_map
+    return to_enum(:my_map) unless block_given?
+
+    mapped_array = []
+    self.my_each { |element| mapped_array << (yield element) }
+    return mapped_array
+  end
 end
 
 # You will first have to define my_each
