@@ -14,10 +14,15 @@ module Enumerable
   def my_select
     return to_enum(:my_select) unless block_given?
 
-    # Enumerable.select always returns an array, regardless of the class of self.
-    selected_array = []
-    self.my_each { |element| selected_array << element if yield element }
-    return selected_array
+    # Enumerable.select always returns an Array by default. This implementation must act a little differently,
+    # then, in order to accommodate Hash's overrided logic.
+    selected_elements = self.class.new
+    if self.is_a? Array
+      self.my_each { |element| selected_elements << element if yield element}
+    else # Hash
+      self.my_each { |element| selected_elements[element[0]] = element[1] if yield element}
+    end
+    return selected_elements
   end
 
   def my_all?
@@ -70,8 +75,20 @@ class Array
   def my_each
     return to_enum(:my_each) unless block_given?
 
-    self.length.times do |index|
+    self.size.times do |index|
       yield self[index]
+    end
+    return self
+  end
+end
+
+class Hash
+  def my_each
+    return to_enum(:my_each) unless block_given?
+
+    self.keys.size.times do |index|
+      current_key = self.keys[index]
+      yield [current_key, self[current_key]]
     end
     return self
   end
