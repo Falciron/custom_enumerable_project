@@ -10,6 +10,17 @@ module Enumerable
     end
     return self
   end
+
+  def my_select
+    return to_enum(:my_select) unless block_given?
+
+    # Enumerable.select always returns an array, regardless of the class of self.
+    selected_array = []
+    self.my_each do |element|
+      selected_array << element if yield element
+    end
+    return selected_array
+  end
 end
 
 # You will first have to define my_each
